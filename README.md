@@ -67,7 +67,7 @@ I'm aware it's not in the best shape yet, but hopefully you get something out of
 
 -------
 
-Buy me a coffee! I accept payment in many cryptoS
+Buy me a coffee! I accept payment in many cryptos
 
 - OCEAN (ERC20 Token): 0x0C39971Ed42a2A1Fe33B3602255773F64D0B420b
 - ETH: 0x0C39971Ed42a2A1Fe33B3602255773F64D0B420b
