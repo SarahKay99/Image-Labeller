@@ -7,7 +7,7 @@ Use *Pygame 1.9.5* or it will not work.
 
 # HOW TO USE IMAGE-LABELLER:
 
-**STEP 1: Download Python 3.9**
+**STEP 1: Download Python 3.9 or 3.7**
 
 Update Python or uninstall + reinstall, if you already have it installed. If not, go to the Python website and download the correct version for your computer. https://www.python.org/downloads/release/python-390/
 
