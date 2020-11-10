@@ -13,7 +13,7 @@ Update Python or uninstall + reinstall, if you already have it installed. If not
 
 **STEP 2: Make sure you're using Pygame 1.9.5**
 
-In Command Prompt (CMD), type `python` and them `import pygame`:
+In Command Prompt (CMD), type `python` and then `import pygame`:
 
 ```
 > python
@@ -24,9 +24,11 @@ Hello from the pygame community. https://www.pygame.org/contribute.html
 
 ```
 
-The version should print. If you have the latest version, it will be 2.0.0. This is bad.
+The version should print. If you get an error, install Pygame with pip or conda. 
 
-Right now you can only change the version this project uses, with PyCharm.
+If you have the latest version of Pygame, it will be 2.0.0+. This is bad.
+
+Right now you can only change the PyGame version this project uses with PyCharm.
 
 Install PyCharm Community Edition if you don't have it. https://www.jetbrains.com/pycharm/download/
 
