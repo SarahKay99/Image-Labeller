@@ -33,11 +33,12 @@ FEATURES IN PROGRESS:
 """
 
 """
-All will be ready by 03/03/2020
+    All will be ready by 03/03/2020
 """
 
 # globals
 pygame.init()
+DISPLAYSURF = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 white = (255, 255, 255)
 black = (0, 0, 0)
 green = (0, 255, 0)
@@ -80,8 +81,8 @@ def centers_to_corners(box, width, height):
 def write_to_file(coords, width, height, filename, category):
     """
     :param coords: [(x0, x1), (y0, y1)]
-    :param width: int or float. whole image.
-    :param height: int or float. whole image.
+    :param width: int or float. whole image width in px.
+    :param height: int or float. whole image height in px.
     :param filename: string.
     :param category: int. category index.
     :return:
@@ -146,6 +147,11 @@ class Application:
         self.inds = list(range(0, len(class_names)))
 
     def define_class_names(self, names_file):
+        """
+        Edits variable self.class_names
+        :param names_file:
+        :return:
+        """
         self.class_names = []
         with open(names_file) as n:
             names = n.readlines()
@@ -197,7 +203,6 @@ class Application:
         """
         :param merge_list: List of integers. Must all be in range of len(self.class_names)
         :param new_name: String. The name of the new class.
-
         Copies all boxes where line[0] in merge_list[:-1], with line[0] = merge_list[-1]
         then, for ind = merge_list[:-1], self.remove_class(ind)
         New class index is the index of the last class in merge_list.
@@ -253,7 +258,6 @@ class Application:
         :param file_ad: string. .txt file address to look through.
         :param show_class: int list []. list of desired classes. can't be blank.
         :return:
-
         Checks if the .txt file contains boxes of the desired classes.
         """
         if not show_class:
@@ -386,7 +390,6 @@ class Application:
         :param og_class: int. class to change from.
         :param change: int. class to change to.
         :return:
-
         Useful if you group your data by filenames.
         i.e. you name all your USB images with "USB" in them, but class them as "plugged cable" or "unplugged".
         If you add the USB class, you can easily put USB imgs in their own folder and run this function to change them.
@@ -493,7 +496,6 @@ class Application:
             'imgs': [vector of strings, all image addresses this class is found in.]
             }
             ... * len(classes)
-
         }
         :return:
         """
@@ -613,155 +615,156 @@ class Application:
                 close = False
 
                 while not close:
-                    # event handling
+                    # === EVENT HANDLING === #
                     for event in pygame.event.get():
+                        if event not in [{}, []]:
+                            # MOUSE BUTTONS
+                            if event.type == 6:     # mouseButtonUp --> click of any button. first requires mousebuttondown.
+                                pos = event.dict["pos"]
+                                print("POS = ", pos)
 
-                        # MOUSE BUTTONS
-                        if event.type == 6:     # mouseButtonUp --> click of any button. first requires mousebuttondown.
-                            pos = event.dict["pos"]
-
-                            if event.dict["button"] == 3:   # right click
-                                box_ops = [0]
-                            else:
-                                box_ops = []    # cancels any right-click operations we had.
-                                if len(coords) < 3:
-                                    coords.append(pos)
+                                if event.dict["button"] == 3:   # right click
+                                    box_ops = [0]
                                 else:
-                                    coords = []     # resetting coords
-                                    print("Coords has been reset.")
-                                    coords.append(pos)
+                                    box_ops = []    # cancels any right-click operations we had.
+                                    if len(coords) < 3:
+                                        coords.append(pos)
+                                    else:
+                                        coords = []     # resetting coords
+                                        print("Coords has been reset.")
+                                        coords.append(pos)
 
-                        # KEY PRESSES
-                        if event.type == 2:  # KEYDOWN
+                            # KEY PRESSES
+                            if event.type == 2:  # KEYDOWN
 
-                            # ARROW KEYS
-                            if event.dict["unicode"] == '':
+                                # ARROW KEYS
+                                if event.dict["unicode"] == '':
 
-                                # RIGHT ARROW
-                                if event.dict["key"] == 275:
-                                    # go forward
-                                    coords = []
-                                    close = True
-                                    if i < len(imgs) - 1:
-                                        i += 1
-                                    continue
-
-                                # LEFT ARROW
-                                elif event.dict["key"] == 276:
-                                    # go back
-                                    coords = []
-                                    close = True
-                                    if i > 0:
-                                        i -= 1
-                                    continue
-
-                            # NON-ARROW keys
-                            # M KEY: Merge classes
-                            if event.dict["unicode"] == "m":
-                                prompt = "===Press C to cancel===\n"
-                                for word in enumerate(self.class_names):
-                                    prompt += str(word[0]) + ": " + word[1] + "\n"
-
-                                # merge: change from a string to a list of numbers
-                                merge = input("Choose which classes numbers to merge, seperated by commas: ")
-                                merge.split(",")
-
-                                for ind, ele in enumerate(merge):
-                                    ele = ele.strip()
-                                    ele = int(ele)  # changing it to a number
-                                    if ele not in range(0):
-                                        print("***CONTINUE ERROR:*** Number " + str(ele) + " out of range. Start again.")
+                                    # RIGHT ARROW
+                                    if event.dict["key"] == 275:
+                                        # go forward
+                                        coords = []
+                                        close = True
+                                        if i < len(imgs) - 1:
+                                            i += 1
                                         continue
-                                    merge[ind] = ele
 
-                                if len(merge) <= 1:
-                                    print("***CONTINUE ERROR:*** You need more than one number. Start again.")
-                                    continue
+                                    # LEFT ARROW
+                                    elif event.dict["key"] == 276:
+                                        # go back
+                                        coords = []
+                                        close = True
+                                        if i > 0:
+                                            i -= 1
+                                        continue
 
-                                new_name = input("Name your merged class: ")
+                                # NON-ARROW keys
+                                # M KEY: Merge classes
+                                if event.dict["unicode"] == "m":
+                                    prompt = "===Press C to cancel===\n"
+                                    for word in enumerate(self.class_names):
+                                        prompt += str(word[0]) + ": " + word[1] + "\n"
 
-                                self.merge_classes(merge, new_name)
+                                    # merge: change from a string to a list of numbers
+                                    merge = input("Choose which classes numbers to merge, seperated by commas: ")
+                                    merge.split(",")
 
-                            # C KEY: Cancels / resets all operations.
-                            if event.dict["unicode"] == "c":    # c-key
-                                if coords:
-                                    coords = []
-                                if box_ops:
-                                    box_ops = []
-
-                            # I KEY: Shows info about the dataset
-                            if event.dict["unicode"] == "i":
-                                """In Progress"""
-                                # self.show_info()
-                                pass
-
-                            # D KEY: Delete a class
-                            if event.dict["unicode"] == "d":
-                                prompt = "===Press C to cancel===\n"
-                                for word in enumerate(self.class_names):
-                                    prompt += str(word[0]) + ": " + word[1] + "\n"
-                                ind = input(prompt + "Select a class to remove: ")
-
-                                if ind in ele_to_string(list(range(0, len(self.class_names)))):
-                                    ind = int(ind)
-                                    self.remove_class(ind)
-
-                                elif ind in ["C, c"]:
-                                    continue
-
-                            # A KEY: Add a class
-                            if event.dict["unicode"] == "a":
-                                class_name = input("Name your new class: ")
-                                self.add_class(class_name)
-
-                            # IF RIGHT CLICKED:
-                            if box_ops == [0]:
-
-                                # RIGHT CLICK + D-KEY: Deletes whole image
-                                if event.dict["unicode"] == "d":
-                                    status = ''
-                                    while status not in ["Y", "y", "N", "n"]:
-                                        status = input("Are you sure you want to delete this image? [Y/N]: ")
-
-                                        # flag image for removal if Y
-                                        if status in ["Y", "y"]:
-                                            if file_ad not in removed:
-                                                removed.append(file_ad)
-                                                removed.append(pre + ".txt")
-
-                                        # continue if N
-                                        elif status in ["N", "n"]:
+                                    for ind, ele in enumerate(merge):
+                                        ele = ele.strip()
+                                        ele = int(ele)  # changing it to a number
+                                        if ele not in range(0):
+                                            print("***CONTINUE ERROR:*** Number " + str(ele) + " out of range. Start again.")
                                             continue
+                                        merge[ind] = ele
 
-                                # RIGHT CLICK + U-KEY: Restores image flagged for removal
-                                if event.dict["unicode"] == "u":
-                                    if file_ad in removed:
-                                        removed.remove(file_ad)
-                                        removed.remove(pre + ".txt")
+                                    if len(merge) <= 1:
+                                        print("***CONTINUE ERROR:*** You need more than one number. Start again.")
+                                        continue
 
-                                # RIGHT CLICK + E-KEY: Edits box
-                                if event.dict["unicode"] == "e":
-                                    print("Changing box class...")
-                                    self.change_box_class(pos, pre + ".txt", width, height)
+                                    new_name = input("Name your merged class: ")
 
-                                # RIGHT CLICK + R-KEY: Removes box
-                                """In Progress. Fix bug where it removes the one outside."""
-                                if event.dict["unicode"] == "r":
-                                    if not pos:
-                                        print("WARNING: pos is blank. remove_box has no effect.")
-                                    remove_box(pos, pre + ".txt", width, height)
-                                    box_ops = []
+                                    self.merge_classes(merge, new_name)
 
-                        if event.type == pygame.QUIT:
-                            # keep track of which image we're currently annotating before we close.
-                            with open("last_ad.txt", "w+") as last_ad:
-                                last_ad.write(file_ad)
+                                # C KEY: Cancels / resets all operations.
+                                if event.dict["unicode"] == "c":    # c-key
+                                    if coords:
+                                        coords = []
+                                    if box_ops:
+                                        box_ops = []
 
-                            # removes any images we flagged for removal.
-                            for file in removed:
-                                os.remove(file)
+                                # I KEY: Shows info about the dataset
+                                if event.dict["unicode"] == "i":
+                                    """In Progress"""
+                                    # self.show_info()
+                                    pass
 
-                            sys.exit()  # exits the whole program
+                                # D KEY: Delete a class
+                                if event.dict["unicode"] == "d":
+                                    prompt = "===Press C to cancel===\n"
+                                    for word in enumerate(self.class_names):
+                                        prompt += str(word[0]) + ": " + word[1] + "\n"
+                                    ind = input(prompt + "Select a class to remove: ")
+
+                                    if ind in ele_to_string(list(range(0, len(self.class_names)))):
+                                        ind = int(ind)
+                                        self.remove_class(ind)
+
+                                    elif ind in ["C, c"]:
+                                        continue
+
+                                # A KEY: Add a class
+                                if event.dict["unicode"] == "a":
+                                    class_name = input("Name your new class: ")
+                                    self.add_class(class_name)
+
+                                # IF RIGHT CLICKED:
+                                if box_ops == [0]:
+
+                                    # RIGHT CLICK + D-KEY: Deletes whole image
+                                    if event.dict["unicode"] == "d":
+                                        status = ''
+                                        while status not in ["Y", "y", "N", "n"]:
+                                            status = input("Are you sure you want to delete this image? [Y/N]: ")
+
+                                            # flag image for removal if Y
+                                            if status in ["Y", "y"]:
+                                                if file_ad not in removed:
+                                                    removed.append(file_ad)
+                                                    removed.append(pre + ".txt")
+
+                                            # continue if N
+                                            elif status in ["N", "n"]:
+                                                continue
+
+                                    # RIGHT CLICK + U-KEY: Restores image flagged for removal
+                                    if event.dict["unicode"] == "u":
+                                        if file_ad in removed:
+                                            removed.remove(file_ad)
+                                            removed.remove(pre + ".txt")
+
+                                    # RIGHT CLICK + E-KEY: Edits box
+                                    if event.dict["unicode"] == "e":
+                                        print("Changing box class...")
+                                        self.change_box_class(pos, pre + ".txt", width, height)
+
+                                    # RIGHT CLICK + R-KEY: Removes box
+                                    """In Progress. Fix bug where it removes the one outside."""
+                                    if event.dict["unicode"] == "r":
+                                        if not pos:
+                                            print("WARNING: pos is blank. remove_box has no effect.")
+                                        remove_box(pos, pre + ".txt", width, height)
+                                        box_ops = []
+
+                            if event.type == pygame.QUIT:
+                                # keep track of which image we're currently annotating before we close.
+                                with open("last_ad.txt", "w+") as last_ad:
+                                    last_ad.write(file_ad)
+
+                                # removes any images we flagged for removal.
+                                for file in removed:
+                                    os.remove(file)
+
+                                sys.exit()  # exits the whole program
 
                     # if we have a valid bounding box in the format (top_left, bottom_right)...
                     if len(coords) == 2 and coords[0][0] < coords[1][0] and coords[0][1] < coords[1][1]:
@@ -805,12 +808,9 @@ class Application:
 def convert_to_pretrained(og_data_address, save_address, copy=True):
     """
     IN PROGRESS
-
     Assume you have 15 classes in your new dataset.
     Use when you want to convert your data from classes 0-15 to classes 80-95.
-
     You'd use this when pre-training with COCO.
-
     :param og_data_address: string, the data you want to convert.
     :param save_address: string, where you want to save.
     :return:
@@ -977,10 +977,17 @@ def empty_files(address):
 # addresses = get_dataset_addresses()     # dir
 
 def create_label_files(addresses):
+    """
+    Creates corresponding .txt files for images in the dataset.
+    (i.e. 0001.png, 0002.png ==> 0001.txt, 0002.txt)
+    :param addresses: [ ] of strings
+    :return:
+    """
     for address in addresses:
         for dirpath, dirnames, filenames in os.walk(address):
             files = os.listdir(dirpath)
             for file in files:
+                # create full file name
                 this_dir = os.path.join(dirpath, file)
 
                 # creating .txt file IF it doesn't already exist
@@ -988,14 +995,13 @@ def create_label_files(addresses):
                     pre, ext = path.splitext(this_dir)  # splits filepath into stem and extension.
                     open(pre + ".txt", 'a').close()  # creates a .txt file with the same name, different extension.
 
+"""
+    ADDRESSES TO FILES MANUALLY ENTERED HERE.
+"""
 
-addresses = [r'C:\Users\smanc\OneDrive\Documents\GitHub\AI Network Inspector\Dataset (+200)']
+addresses = [r'C:\Users\Sarah\Documents\GitHub\Visual-Mathematical-Equations-VME\photos']
 create_label_files(addresses)
-
-train_img_address = r'yolov3\networkeq\images\train'    # dir
-train_label_address = r'yolov3\networkeq\labels\train'  # dir
-image_list_file = r'yolov3\data\networkeq.txt'  # always .txt
-names_file = r'yolov3\data\networkeq.names'
+names_file = r'C:\Users\Sarah\Documents\GitHub\Visual-Mathematical-Equations-VME\formats\darknet\names.txt'
 
 class_names = []
 with open(names_file) as n:
@@ -1006,12 +1012,15 @@ with open(names_file) as n:
 
 print(class_names)
 
-app = Application(class_names, addresses, r'yolov3\data\networkeq.names', False, False)
+app = Application(class_names, addresses, names_file, False, False)
 app.main()
 
 # for address in addresses:
 #     write_to_darknet(address, train_img_address, train_label_address, image_list_file, True)
 
+# train_img_address = r''             # dir
+# train_label_address = r''           # dir
+# image_list_file = r''               # always .txt
 # convert_to_pretrained('NBN Dataset - Our Data Only', 'NBN Dataset - Pre-trained', False)
 
 
